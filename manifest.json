@@ -1,0 +1,20 @@
+{
+    "manifest_version": 2,
+    "name": "Highlighted Text Link Generator",
+    "version": "1.0",
+
+    "background": {
+        "scripts": ["src/scripts/highlighttextlink.js"],
+        "persistent": false
+    },
+    "permissions": [
+        "activeTab",
+        "contextMenus"
+    ],
+    "icons": {
+        "16": "src/images/highlighted-text-extension-16.png",
+        "32": "src/images/highlighted-text-extension-32.png",
+        "48": "src/images/highlighted-text-extension-48.png",
+        "128": "src/images/highlighted-text-extension-128.png"
+    }
+}
