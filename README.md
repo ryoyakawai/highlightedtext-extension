@@ -1,1 +1,1 @@
-#highlightedtext-extension
+# highlightedtext-extension
