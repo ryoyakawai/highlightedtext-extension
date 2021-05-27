@@ -1,7 +1,5 @@
 'use strict';
-
 {
-
   const _TEXT_CONTEXT = "Copy highlighting text URL 👉 [%s]"
   const copyToClipboard = str => {
     const el = document.createElement('textarea')
@@ -23,6 +21,4 @@
   chrome.contextMenus.onClicked.addListener(item => {
     copyToClipboard(`${item.pageUrl.split('#').shift()}#:~:text=${item.selectionText}`)
   })
-
 }
-
