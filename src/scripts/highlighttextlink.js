@@ -1,6 +1,8 @@
 'use strict';
 
 {
+
+  const _TEXT_CONTEXT = "Copy highlighting text URL 👉 [%s]"
   const copyToClipboard = str => {
     const el = document.createElement('textarea')
     el.value = str
@@ -12,7 +14,7 @@
 
   chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
-      title: "Copy link with high light -> [%s]",
+      title: _TEXT_CONTEXT,
       contexts:["selection"],
       id: 'highlightText',
     });
