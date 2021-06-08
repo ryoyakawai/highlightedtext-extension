@@ -8,10 +8,22 @@
         "persistent": false
     },
     "permissions": [
+        "storage",
         "activeTab",
         "contextMenus",
         "tabs",
         "bookmarks"
+    ],
+    "background": {
+        "page": "src/background.html",
+        "persistent": false
+    },
+    "content_scripts": [
+        {
+            "matches": [ "file:///*/options.html", "file:///*/popup.html", "file:///*/callback.html"],
+            "js": ["src/scripts/inject.js"],
+            "run_at": "document_start"
+        }
     ],
     "icons": {
         "16": "src/images/highlighted-text-extension-16.png",
