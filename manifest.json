@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Highlighted Text Link Generator",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Generate and copy to clipboard text highlighted link by selecting text in web page.",
     "background": {
         "scripts": ["src/scripts/highlighttextlink.js"],
