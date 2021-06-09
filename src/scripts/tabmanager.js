@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import { getStorage, setStorage, setWakeupAction } from './chromestorageutils.js';
+import { getStorageLocal, setStorageLocal, setWakeupAction } from './chromestorageutils.js';
 
 /*
  *   config = {
@@ -51,21 +51,21 @@ export class TabManager {
       this.uuid=this.generateUuidv4()
     }
     try {
-      this.stored.config = await getStorage(this.config_name)
+      this.stored.config = await getStorageLocal(this.config_name)
       if (this.stored.config == null) this.stored.config = {}
       if (Object.keys(this.stored.config).length < 1) {
-        await setStorage(this.config_name, this.def_config)
+        await setStorageLocal(this.config_name, this.def_config)
       }
 
       await this.setStoredHistory()
-      console.log(await getStorage(this.history_name), await getStorage(this.config_name))
+      console.log(await getStorageLocal(this.history_name), await getStorageLocal(this.config_name))
     } catch(err) {
       console.trace('[ERR] ', err)
     }
   }
 
   async setStoredHistory() {
-    this.stored.history = await getStorage(this.history_name)
+    this.stored.history = await getStorageLocal(this.history_name)
     if (this.stored.history == null) this.stored.history = []
     /*
     this.stored.history.push(
@@ -97,11 +97,11 @@ export class TabManager {
     while(this.stored.history.length > this.stored.config.max_gen) {
       this.stored.history.shift()
     }
-    await setStorage(this.history_name, this.stored.history)
+    await setStorageLocal(this.history_name, this.stored.history)
   }
 
   async getStoredHistory() {
-    let ret = await getStorage(this.history_name)
+    let ret = await getStorageLocal(this.history_name)
     return ret
   }
 

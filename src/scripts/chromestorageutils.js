@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-export { getStorage, setStorage, setWakeupAction }
+export { getStorage, setStorage, getStorageLocal, setStorageLocal, setWakeupAction }
 
 async function getStorage(name) {
   return new Promise( (resolve, reject) => {
@@ -38,6 +38,36 @@ async function setStorage(name, data) {
       let setData = {}
       setData[name] = data
       chrome.storage.sync.set(setData, () => {
+        resolve(true)
+      })
+    } catch(e) {
+      reject(new Error(e))
+    }
+  })
+}
+
+async function getStorageLocal(name) {
+  return new Promise( (resolve, reject) => {
+    try {
+      chrome.storage.local.get(name, (data) => {
+        if(typeof data[name]=='undefined') {
+          data[name] = null
+        }
+        resolve(data[name])
+      })
+    } catch (e) {
+      console.log('[ERR:Storage] ', e)
+      reject(new Error(e))
+    }
+  })
+}
+
+async function setStorageLocal(name, data) {
+  return new Promise((resolve, reject) => {
+    try {
+      let setData = {}
+      setData[name] = data
+      chrome.storage.local.set(setData, () => {
         resolve(true)
       })
     } catch(e) {
