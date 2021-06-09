@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-export { getStorage, setStorage }
+export { getStorage, setStorage, setWakeupAction }
 
 async function getStorage(name) {
   return new Promise( (resolve, reject) => {

@@ -11,12 +11,11 @@
         "storage",
         "activeTab",
         "contextMenus",
-        "tabs",
-        "bookmarks"
+        "tabs"
     ],
     "background": {
         "page": "src/background.html",
-        "persistent": false
+        "persistent": true
     },
     "content_scripts": [
         {
@@ -25,6 +24,15 @@
             "run_at": "document_start"
         }
     ],
+    "browser_action": {
+        "default_popup": "src/popup.html",
+        "default_icon": {
+            "16": "src/images/highlighted-text-extension-16.png",
+            "32": "src/images/highlighted-text-extension-32.png",
+            "48": "src/images/highlighted-text-extension-48.png",
+            "128": "src/images/highlighted-text-extension-128.png"
+        }
+    },
     "icons": {
         "16": "src/images/highlighted-text-extension-16.png",
         "32": "src/images/highlighted-text-extension-32.png",
