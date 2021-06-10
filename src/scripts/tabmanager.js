@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-import { getStorageLocal, setStorageLocal, setWakeupAction } from './chromestorageutils.js';
+import { getStorage, setStorage, getStorageLocal, setStorageLocal, setWakeupAction } from './chromestorageutils.js';
 
 /*
  *   config = {
@@ -41,7 +41,7 @@ export class TabManager {
       'groupId', 'id', 'windowId',
       'title', 'url', 'status', 'favIconUrl',
       //'selected', 'pinned',
-      //'height', 'width'
+      'height', 'width'
     ],
     this.closedWindowId=[]
   }
@@ -55,6 +55,8 @@ export class TabManager {
       if (this.stored.config == null) this.stored.config = {}
       if (Object.keys(this.stored.config).length < 1) {
         await setStorageLocal(this.config_name, this.def_config)
+      } else {
+        this.def_config = this.stored.config
       }
 
       await this.setStoredHistory()
@@ -66,6 +68,29 @@ export class TabManager {
 
   async setStoredHistory() {
     this.stored.history = await getStorageLocal(this.history_name)
+    /*
+    const history_sync = await this.getStoredHistorySync()
+    console.log('[SYNC]', history_sync)
+    const history_sync = await this.getStoredHistorySync()
+    if (history_sync != null) {
+      let isExists = false
+      this.stored.history.forEach( (item, idx) => {
+        if (item.uuid == history_sync.uuid) {
+          isExists = true
+          if(item.timestamp < history_sync.timestamp) {
+            item.history = history_sync.history
+            item.updated_at = history_sync.updated_at
+            item.timestamp = history_sync.timestamp
+            this.stored.history[idx] = item
+          }
+        }
+      })
+      if (!isExists) {
+        this.stored.history.push(history_sync)
+      }
+    }
+    */
+
     if (this.stored.history == null) this.stored.history = []
     /*
     this.stored.history.push(
@@ -81,6 +106,7 @@ export class TabManager {
       if (item.uuid == this.uuid) {
         item.history = this.getTabManager()
         item.updated_at = this.getDateTime()
+        item.timestamp = Date.now()
         isMember = true
         this.stored.history[idx] = item
       }
@@ -90,6 +116,7 @@ export class TabManager {
         {
           history: this.getTabManager(),
           updated_at: this.getDateTime(),
+          timestamp: Date.now(),
           uuid: this.uuid
         }
       )
@@ -97,7 +124,22 @@ export class TabManager {
     while(this.stored.history.length > this.stored.config.max_gen) {
       this.stored.history.shift()
     }
+    //console.log(this.stored.history)
+    this.stored.history.sort( (a, b) => {
+      return a.timestamp - b.timestamp
+    })
     await setStorageLocal(this.history_name, this.stored.history)
+    // using chrome sync
+    //await this.setStoredHistorySync()
+  }
+
+  async setStoredHistorySync(store_array=[]) {
+    await setStorage(this.history_name, store_array)
+  }
+
+  async getStoredHistorySync() {
+    let ret = await getStorage(this.history_name)
+    return ret
   }
 
   async getStoredHistory() {
@@ -234,6 +276,19 @@ export class TabManager {
       }
     }
     this.tab_manager = tmp_tab_manager
+  }
+
+  //
+  async removeOneHistory(remove_uuid=null) {
+    if (remove_uuid==null) {
+      return
+    }
+    const tmp_mgr = (await this.getStoredHistory()).filter( (item) => {
+      if (item.uuid != remove_uuid) {
+        return item
+      }
+    })
+    await setStorageLocal(this.history_name, tmp_mgr)
   }
 
   cleanTabInfo(tab = {}) {

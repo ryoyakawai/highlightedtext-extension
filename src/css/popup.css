@@ -1,3 +1,75 @@
 body {
-  width: 400px;
+  background: #e2e1e0;
+  width: 420px;
+  color: #222222;
+}
+
+button {
+  background-color: #e1e1e1;
+  margin: 0 2px;
+  padding: 8px 15px;
+  border: 0px solid #ddd;
+  border-radius: 3px;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+button:hover {
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+button:active {
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.card {
+  background: #fff;
+  /*border: 1px solid #ddd;*/
+  border-radius: 4px;
+  box-shadow: 0 0 1px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,0.12);
+}
+
+div.window-sets-00 {
+  display: flex;
+  width: 400px; /* body width - 20px */
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 10px;
+  margin: 5px 0 10px 0px;
+}
+
+div.in-window-00 {
+  width: 380px; /* div.window-sets-00:width - 20px */
+  padding: 5px 10px;
+  margin: 8px 0;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+div.window-sets-00:hover,
+div.in-window-00:hover {
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+div.in-window-00:active {
+  cursor: pointer;
+  color: #000;
+  background-color: #efefef;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+ul.window-items-00 {
+  padding: 0px 13px;
+  margin: 5px 0px;
+}
+
+ul.window-items-00 > li.window-item-00 {
+  list-style: "✏️ ";
+  margin-bottom: 2px;
+  padding-left: 3px;
+}
+
+div.updated_at_00 {
+  color: #555;
+  padding: 5px;
+  font-size: 1.1em;
+  font-weight: bold;
 }

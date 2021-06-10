@@ -56,21 +56,17 @@ chrome.tabs.query({}, async (tabs) => {
 })
 
 chrome.windows.onRemoved.addListener( async (windowId) => {
-  //tbmgr.setStoredHistory()
   tbmgr.unregistWindows(windowId)
-  //console.log('[onRemoved] ', await tbmgr.getStoredHistory())
   console.log('[windows.onRemoved] ', tbmgr.getTabManager(), windowId)
 })
 
 chrome.tabs.onActivated.addListener( (activeInfo) => {
   tbmgr.updateActiveTab(activeInfo)
   tbmgr.setStoredHistory()
-  //console.log(activeInfo)
 })
 
 chrome.tabs.onCreated.addListener( async (new_tab) => {
   tbmgr.registTab(new_tab)
-  //console.log('[onCreated] ', await tbmgr.getStoredHistory())
   tbmgr.setStoredHistory()
   console.log('[onCreated] ', tbmgr.getTabManager())
 })
@@ -80,7 +76,6 @@ chrome.tabs.onDetached.addListener( async (tabId, detachInfo) => {
   const unregisted_tab = tbmgr.unregistTab(tabId, {windowId: detachInfo.oldWindowId})
   unregisted_tab.windowId = null
   tbmgr.pushTmpDetachTabs(unregisted_tab)
-  //console.log('[onDetached] ', await tbmgr.getStoredHistory())
   tbmgr.setStoredHistory()
   console.log('[onDetached] ', tbmgr.getTabManager())
 })
@@ -89,16 +84,13 @@ chrome.tabs.onAttached.addListener( async (tabId, attachInfo) => {
   const tab_to_attach = tbmgr.getTabToAttach(tabId, attachInfo)
   tab_to_attach.windowId = attachInfo.newWindowId
   tbmgr.registTab(tab_to_attach)
-  //console.log('[onDetached] ', await tbmgr.getStoredHistory())
   tbmgr.setStoredHistory()
   console.log('[onDetached] ', tbmgr.getTabManager())
 })
 
 chrome.tabs.onUpdated.addListener( (tabId, changeInfo, tab) => {
-  //if (changeInfo.status=='complete') {
-    tbmgr.updateTab(tabId, changeInfo, tab)
-    tbmgr.setStoredHistory()
-  //}
+  tbmgr.updateTab(tabId, changeInfo, tab)
+  tbmgr.setStoredHistory()
 })
 
 chrome.tabs.onRemoved.addListener( async (tabId, removeInfo) => {
@@ -106,7 +98,6 @@ chrome.tabs.onRemoved.addListener( async (tabId, removeInfo) => {
     chrome.tabs.query({}, (info) => {
       tbmgr.unregistTab(tabId, removeInfo)
     })
-    //console.log('[onRemove] ', await tbmgr.getStoredHistory())
     tbmgr.setStoredHistory()
     console.log('[tabs.onRemove] ', tbmgr.getTabManager(), tabId, removeInfo)
   }
