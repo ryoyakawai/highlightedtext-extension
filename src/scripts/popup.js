@@ -75,12 +75,21 @@ import { convertStringToDom, convertUTCToJST } from './htmlutils.js';
     let window_div_parent = document.createElement('div')
     item.history.forEach( (window, window_idx) => {
       const window_div_00 = convertStringToDom(`<div id="${item.uuid}:::${window_idx}" class="card in-window-00"></div>`)
+      const window_div_00_ctrl_area = convertStringToDom(`<div class="in-window-00_ctrl_area"></div>`)
+      const button_window_remove_00 = convertStringToDom(`<button id="${item.uuid}:::${window_idx}" class="small">Clear</button>`)
+      window_div_00_ctrl_area.appendChild(button_window_remove_00)
+      button_window_remove_00.addEventListener('mousedown', (event) => {
+        console.log(event.target.id)
+        event.preventDefault()
+        event.stopPropagation()
+      }, false)
       const window_items_ul_00 = convertStringToDom(`<ul class="window-items-00"></ul>`)
       window.tabs.forEach( (tab, tab_idx) => {
         const li_01 = convertStringToDom(`<li class="window-item-00">${tab.title} ${tab.active===true ? '😎' : ''}</li>`)
         window_items_ul_00.appendChild(li_01)
         //window_div_00.appendChild(div_01)
       })
+      window_div_00.appendChild(window_div_00_ctrl_area)
       window_div_00.appendChild(window_items_ul_00)
       window_div_parent.appendChild(window_div_00)
       window_div_00.addEventListener('mousedown', (event) => {
