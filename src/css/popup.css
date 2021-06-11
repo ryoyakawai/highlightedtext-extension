@@ -59,8 +59,8 @@ div.in-window-00 {
 
 div.in-window-00_ctrl_area {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row-reverse;
+  /*align-items: flex-end;*/
 }
 
 div.window-sets-00:hover,

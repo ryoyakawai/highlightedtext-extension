@@ -25,34 +25,13 @@ import { convertStringToDom, convertUTCToJST } from './htmlutils.js';
       })
       target_data.forEach( sets => {
         sets.history.forEach(wndw => {
-          chrome.windows.create({
-            type: 'normal',
-            width: wndw.tabs[0].width,
-            height: wndw.tabs[0].height
-          }, (windowInfo) => {
-            let firstTabId = windowInfo.tabs.slice().shift().id
-            wndw.tabs.forEach(tab => {
-              if (tab.url.match(/^chrome:\/\//)===null) {
-                let createData = {
-                  url: tab.url,
-                  active: tab.active
-                }
-                if(firstTabId!=null) {
-                  chrome.tabs.update(firstTabId, createData, (event) => {})
-                  firstTabId = null
-                } else {
-                  createData.windowId=windowInfo.id
-                  chrome.tabs.create(createData, (event) => {})
-                }
-              }
-            })
-          })
+          openWindowsTabs(wndw, null)
         })
       })
     }, false)
     const button_remove_00 = convertStringToDom(`<button id="${item.uuid}">REMOVE</button>`)
     button_remove_00.addEventListener('mousedown', (event) => {
-      tbmgr.removeOneHistory(event.target.id)
+      tbmgr.removeOneHistory(event.target.id) // event.target.id: uuid
       document.querySelector(`#history-parent-${item.uuid}`).remove()
     }, false)
     const button_sync_00 = convertStringToDom(`<button id="${item.uuid}">SYNC</button>`)
@@ -72,14 +51,39 @@ import { convertStringToDom, convertUTCToJST } from './htmlutils.js';
     div_00.appendChild(ctrl_area_div)
     content_area.appendChild(div_00)
 
-    let window_div_parent = document.createElement('div')
+    let window_div_parent = convertStringToDom(`<div id="window-parent-${item.uuid}"></div>`)
     item.history.forEach( (window, window_idx) => {
-      const window_div_00 = convertStringToDom(`<div id="${item.uuid}:::${window_idx}" class="card in-window-00"></div>`)
+      const window_div_00 = convertStringToDom(`<div id="history-window-${item.uuid}---${window_idx}" class="card in-window-00"></div>`)
       const window_div_00_ctrl_area = convertStringToDom(`<div class="in-window-00_ctrl_area"></div>`)
-      const button_window_remove_00 = convertStringToDom(`<button id="${item.uuid}:::${window_idx}" class="small">Clear</button>`)
-      window_div_00_ctrl_area.appendChild(button_window_remove_00)
-      button_window_remove_00.addEventListener('mousedown', (event) => {
-        console.log(event.target.id)
+      const button_window_open_00 = convertStringToDom(`<button id="${item.uuid}---${window_idx}" class="small">open</button>`)
+      const button_window_clear_00 = convertStringToDom(`<button id="${item.uuid}---${window_idx}" class="small">Clear</button>`)
+      window_div_00_ctrl_area.appendChild(button_window_clear_00)
+      window_div_00_ctrl_area.appendChild(button_window_open_00)
+      button_window_clear_00.addEventListener('mousedown', (event) => {
+        const [target_uuid, target_window_idx] = event.target.id.replace(/^history\-window\-/, '').split('---')
+        tbmgr.removeOneWindowHisotry(target_uuid, target_window_idx) // event.target.id: uuid
+        document.querySelector(`#history-window-${event.target.id}`).remove()
+        if (document.querySelector(`div#window-parent-${target_uuid}`).childNodes.length < 1) {
+          document.querySelector(`div#history-parent-${target_uuid}`).remove()
+        }
+        event.preventDefault()
+        event.stopPropagation()
+      }, false)
+      button_window_open_00.addEventListener('mousedown', (event) => {
+        if (event.target.id != '') {
+          event.target.id = event.target.id
+        } else {
+          event.target.id = event.target.parentNode.id != ''
+                          ? event.target.parentNode.id : event.target.parentNode.parentNode.id
+        }
+        const [target_uuid, target_tab_idx] = event.target.id.split('---')
+        for (let i=0; i<historyList.length; i++) {
+          const wndw = historyList[i]
+          if (wndw.uuid == target_uuid) {
+            openWindowsTabs(wndw, target_tab_idx)
+            break
+          }
+        }
         event.preventDefault()
         event.stopPropagation()
       }, false)
@@ -93,50 +97,88 @@ import { convertStringToDom, convertUTCToJST } from './htmlutils.js';
       window_div_00.appendChild(window_items_ul_00)
       window_div_parent.appendChild(window_div_00)
       window_div_00.addEventListener('mousedown', (event) => {
-        if (event.target.id != '') {
-          event.target.id = event.target.id
-        } else
-        if (event.target.parentNode.id != '') {
-          event.target.id = event.target.parentNode.id
-        } else
-        if (event.target.parentNode.parentNode.id != '') {
-          event.target.id = event.target.parentNode.parentNode.id
-        }
-        console.log(event.target.id)
-        const [target_uuid, target_tab_idx] = event.target.id.split(':::')
-        for (let i=0; i<historyList.length; i++) {
-          const wndw = historyList[i]
-          if (wndw.uuid == target_uuid) {
-            console.log(wndw.history[target_tab_idx])
-            chrome.windows.create({
-              type: 'normal',
-              width: wndw.history[target_tab_idx].tabs[0].width,
-              height: wndw.history[target_tab_idx].tabs[0].height
-            }, (windowInfo) => {
-              let firstTabId = windowInfo.tabs.slice().shift().id
-              wndw.history[target_tab_idx].tabs.forEach(tab => {
-                if (tab.url.match(/^chrome:\/\//)===null) {
-                  let createData = {
-                    url: tab.url,
-                    active: tab.active
-                  }
-                  if(firstTabId!=null) {
-                    chrome.tabs.update(firstTabId, createData, (event) => {})
-                    firstTabId = null
-                  } else {
-                    createData.windowId=windowInfo.id
-                    chrome.tabs.create(createData, (event) => {})
-                  }
-                }
-              })
-            })
-            break
-          }
-        }
+        console.log('[CLICKED DIV ELEM]')
+        event.preventDefault()
+        event.stopPropagation()
       }, false)
     })
     div_00.appendChild(window_div_parent)
   })
 
+  function openWindowsTabs(wndw=null, target_tab_idx=null) {
+    const window_size = {}
+    if (target_tab_idx != null) {
+      window_size.width = wndw.history[0].tabs[0].width
+      window_size.height = wndw.history[0].tabs[0].height
+    } else {
+      window_size.width = wndw.tabs[0].width
+      window_size.height = wndw.tabs[0].height
+    }
+    chrome.windows.create({
+      type: 'normal',
+      width: window_size.width,
+      height: window_size.height
+    }, (windowInfo) => {
+      _openTabs(windowInfo, wndw, target_tab_idx)
+    })
+
+    function _openTabs(windowInfo=null, wndw=null, target_tab_idx=null) {
+      if (windowInfo==null || wndw==null) {
+        return
+      }
+      let firstTabId = windowInfo.tabs.slice().shift().id
+      let forEachTabs = []
+      if (target_tab_idx!=null) {
+        forEachTabs = wndw.history[target_tab_idx].tabs
+      } else {
+        forEachTabs = wndw.tabs
+      }
+      forEachTabs.forEach(tab => {
+        if (tab.url.match(/^chrome:\/\//)===null) {
+          let createData = {
+            url: tab.url,
+            active: tab.active
+          }
+          if(firstTabId!=null) {
+            chrome.tabs.update(firstTabId, createData, (event) => {})
+            firstTabId = null
+          } else {
+            createData.windowId=windowInfo.id
+            chrome.tabs.create(createData, (event) => {})
+          }
+        }
+      })
+    }
+  }
+
+/*
+  function openTabs(windowInfo=null, wndw=null, target_tab_idx=null) {
+    if (windowInfo==null || wndw==null) {
+      return
+    }
+    let firstTabId = windowInfo.tabs.slice().shift().id
+    let forEachTabs = []
+    if (target_tab_idx!=null) {
+      forEachTabs = wndw.history[target_tab_idx].tabs
+    } else {
+      forEachTabs = wndw.tabs
+    }
+    forEachTabs.forEach(tab => {
+      if (tab.url.match(/^chrome:\/\//)===null) {
+        let createData = {
+          url: tab.url,
+          active: tab.active
+        }
+        if(firstTabId!=null) {
+          chrome.tabs.update(firstTabId, createData, (event) => {})
+          firstTabId = null
+        } else {
+          createData.windowId=windowInfo.id
+          chrome.tabs.create(createData, (event) => {})
+        }
+      }
+    })
+  }
+*/
   //document.querySelector("div#debug_area").innerHTML = JSON.stringify(historyList)
 })()
