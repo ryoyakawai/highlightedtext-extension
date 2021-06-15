@@ -57,8 +57,22 @@ import { convertStringToDom, convertUTCToJST } from './htmlutils.js';
       const window_div_00_ctrl_area = convertStringToDom(`<div class="in-window-00_ctrl_area"></div>`)
       const button_window_open_00 = convertStringToDom(`<button id="${item.uuid}---${window_idx}" class="small">open</button>`)
       const button_window_clear_00 = convertStringToDom(`<button id="${item.uuid}---${window_idx}" class="small">Clear</button>`)
+      const button_window_copy_00 = convertStringToDom(`<button id="${item.uuid}---${window_idx}" class="small">Copy</button>`)
+      window_div_00_ctrl_area.appendChild(button_window_copy_00)
       window_div_00_ctrl_area.appendChild(button_window_clear_00)
       window_div_00_ctrl_area.appendChild(button_window_open_00)
+      button_window_copy_00.addEventListener('mousedown', async (event) => {
+        const [target_uuid, target_window_idx] = event.target.id.replace(/^history\-window\-/, '').split('---')
+        let arr_copy_to_clipboard = []
+        try {
+          (await tbmgr.fetchOneHistory(target_uuid, target_window_idx)).forEach( item => {
+            arr_copy_to_clipboard.push(`[${item.title}] ${item.url}`)
+          })
+          await navigator.clipboard.writeText(arr_copy_to_clipboard.join("\n"))
+        } catch(err) {
+          console.error('Failed to copy: ', err)
+        }
+      })
       button_window_clear_00.addEventListener('mousedown', (event) => {
         const [target_uuid, target_window_idx] = event.target.id.replace(/^history\-window\-/, '').split('---')
         tbmgr.removeOneWindowHisotry(target_uuid, target_window_idx) // event.target.id: uuid

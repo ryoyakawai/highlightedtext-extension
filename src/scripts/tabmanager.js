@@ -279,6 +279,20 @@ export class TabManager {
   }
 
   //
+  async fetchOneHistory(remove_uuid=null, target_window_idx=null) {
+    if (remove_uuid==null || target_window_idx==null) {
+      return
+    }
+    const historyList = await this.getStoredHistory()
+    let ret_historyList = []
+    for(let i=0; i<historyList.length; i++) {
+      const item = historyList[i]
+      if (item.uuid == remove_uuid) {
+        ret_historyList = historyList[i].history.filter( (tab, window_idx) =>  window_idx == target_window_idx)
+      }
+    }
+    return (ret_historyList.pop()).tabs
+  }
   async removeOneHistory(remove_uuid=null) {
     if (remove_uuid==null) {
       return
